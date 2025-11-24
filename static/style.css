@@ -1,0 +1,517 @@
+/* ---------- ROOT VARIABLES ---------- */
+:root {
+    --bg: #000;
+    --surface: rgba(20, 20, 20, 0.78);
+    --glass: rgba(255, 255, 255, 0.04);
+    --text: #f2f2f2;
+    --text-soft: #cfcfcf;
+    --gradient: linear-gradient(135deg, #833ab4, #e1306c, #fcb045);
+    --radius: 22px;
+    --border: 1px solid rgba(255, 255, 255, 0.08);
+    --transition: 0.25s ease;
+}
+
+/* ---------- GLOBAL RESET ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
+}
+
+body {
+    background: var(--bg);
+    min-height: 100vh;
+    padding: 130px 40px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* =====================================================
+   CARD DESIGN
+===================================================== */
+
+.card {
+    width: 100%;
+    max-width: 520px;
+    padding: 45px;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border: var(--border);
+    backdrop-filter: blur(14px);
+
+    box-shadow:
+        0 0 45px rgba(0,0,0,0.7),
+        0 8px 30px rgba(131,58,180,0.2);
+
+    animation: fadeUp 0.55s ease-out;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.35),
+        0 16px 45px rgba(131, 58, 180, 0.15);
+    transition: 0.28s ease;
+}
+
+
+h1 {
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 35px;
+
+    background: var(--gradient);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* =====================================================
+   FILE UPLOAD + DROP AREA
+===================================================== */
+
+.file-box {
+    margin-bottom: 30px;
+}
+
+.file-box label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.file-box input[type="file"] {
+    width: 100%;
+    padding: 14px;
+    border-radius: 15px;
+
+    background: var(--glass);
+    border: 2px dashed rgba(255,255,255,0.14);
+    color: var(--text-soft);
+
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.file-box input[type="file"]:hover {
+    border-color: #e1306c;
+}
+
+.drop-area {
+    padding: 24px;
+    border-radius: 16px;
+    text-align: center;
+    cursor: pointer;
+
+    background: var(--glass);
+    border: 2px dashed rgba(255,255,255,0.25);
+
+    color: var(--text-soft);
+    transition: var(--transition);
+}
+
+.drop-area:hover {
+    border-color: #e1306c;
+}
+
+.drop-area.dragover {
+    background: rgba(255,255,255,0.20);
+    border-color: #fcb045;
+    color: white;
+    transform: scale(1.02);
+    box-shadow: 0 0 14px rgba(252, 176, 69, 0.35);
+}
+
+/* Highlight */
+.file-box.dragover {
+    background: rgba(255, 255, 255, 0.10) !important;
+    border-color: #fcb045 !important;
+    transform: scale(1.02);
+}
+
+/* =====================================================
+   BUTTONS
+===================================================== */
+
+button,
+.btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 16px;
+
+    border: none;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+
+    background: var(--gradient);
+    color: white;
+
+    box-shadow: 0 6px 25px rgba(255,255,255,0.25);
+    transition: var(--transition);
+}
+
+button:hover,
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 6px 22px rgba(255,255,255,0.32),
+        0 0 22px rgba(255, 138, 216, 0.28);
+}
+
+button:active,
+.btn:active {
+    transform: scale(0.96);
+}
+
+/* =====================================================
+   TOGGLE BUTTONS
+===================================================== */
+
+.theme-toggle,
+.info-toggle {
+    position: fixed;
+    top: 20px;
+
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 22px;
+    border-radius: 50%;
+
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(6px);
+
+    cursor: pointer;
+    transition: var(--transition);
+
+    z-index: 999;
+}
+
+.theme-toggle { right: 20px; }
+.info-toggle { right: 80px; }
+
+.theme-toggle:hover,
+.info-toggle:hover {
+    background: rgba(255,255,255,0.22);
+}
+
+body.light-mode .info-toggle {
+    background: rgba(255, 162, 0, 0.85);
+    border-color: rgba(0, 0, 0, 0.25);
+    color: #000;
+}
+
+/* =====================================================
+   RESULT PAGE
+===================================================== */
+
+.result-card {
+    max-width: 650px;
+    padding: 35px 45px 40px;
+}
+
+.result-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-bottom: 40px;
+}
+
+
+.result-list::-webkit-scrollbar { width: 8px; }
+.result-list::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+}
+.result-list::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.18);
+    border-radius: 10px;
+}
+.result-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.28);
+}
+
+
+.result-item {
+    position: relative;
+    padding: 14px 18px 14px 40px;   
+    border-radius: 16px;
+    margin-bottom: 12px;
+
+    background: var(--surface);
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 500;
+
+    backdrop-filter: blur(6px);
+    transition: var(--transition);
+    overflow: hidden;
+}
+
+
+.result-item::before {
+    content: "";
+    position: absolute;
+    left: 16px;                 
+    top: 50%;
+    transform: translateY(-50%) rotate(45deg);
+
+    width: 9px;
+    height: 9px;
+
+    background: linear-gradient(135deg, #fcb045, #e1306c, #833ab4);
+    border-radius: 2px;
+
+    box-shadow:
+        0 0 6px rgba(228, 64, 128, 0.55),
+        0 0 10px rgba(252, 176, 69, 0.45);
+
+    animation: ig-spark-pulse 2s ease-in-out infinite alternate;
+}
+
+
+.result-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+}
+
+
+.result-item:hover {
+    transform: translateX(6px);
+    background: rgba(255,255,255,0.12);
+    box-shadow:
+        0 4px 16px rgba(0,0,0,0.45),
+        0 0 14px rgba(228, 64, 128, 0.30);
+}
+
+/* ---------------- LIGHT MODE ---------------- */
+
+body.light-mode .result-item {
+    background: rgba(0,0,0,0.05);
+    color: #222;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+}
+
+body.light-mode .result-item::before {
+    background: linear-gradient(180deg, #fcb045, #e1306c, #833ab4);
+}
+
+body.light-mode .result-item:hover {
+    background: rgba(0,0,0,0.10);
+    box-shadow:
+        inset 0 0 0 1px rgba(0,0,0,0.10),
+        0 4px 14px rgba(0,0,0,0.10),
+        0 0 16px rgba(228, 64, 128, 0.20);
+}
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.site-footer {
+    margin-top: 40px;
+    font-size: 14px;
+    text-align: center;
+    color: var(--text-soft);
+}
+
+/* =====================================================
+   MODAL POPUP
+===================================================== */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.58);
+    backdrop-filter: blur(4px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modal-card {
+    width: 95%;
+    max-width: 420px;
+    padding: 28px 30px;
+    border-radius: 22px;
+    background: var(--surface);
+    border: var(--border);
+    animation: fadeUp 0.4s ease;
+    box-shadow: 0 0 40px rgba(0,0,0,0.55);
+}
+
+.modal-card h2 {
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: 18px;
+    background: var(--gradient);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.modal-card ul { list-style: none; }
+.modal-card li {
+    margin-bottom: 12px;
+    font-size: 15px;
+    color: var(--text-soft);
+    line-height: 1.4;
+}
+
+/* =====================================================
+   LIGHT MODE (contrast improved)
+===================================================== */
+
+body.light-mode {
+    --bg: #fafafa;
+    --surface: rgba(255,255,255,0.96);
+    --glass: rgba(0,0,0,0.05);
+    --text: #1a1a1a;
+    --text-soft: #555;
+    --border: 1px solid rgba(0,0,0,0.08);
+}
+
+body.light-mode .card,
+body.light-mode .info-card,
+body.light-mode .result-card,
+body.light-mode .modal-card {
+    background: var(--surface);
+    box-shadow:
+        0 8px 22px rgba(0,0,0,0.10),
+        0 15px 40px rgba(0,0,0,0.08),
+        0 0 0 1px rgba(0,0,0,0.04);
+}
+
+/* =====================================================
+   INFO PAGE
+===================================================== */
+
+.info-card {
+    width: 100%;
+    max-width: 680px;
+    padding: 40px 50px;
+    border-radius: var(--radius);
+    border: var(--border);
+    background: var(--surface);
+    backdrop-filter: blur(12px);
+    animation: fadeUp 0.6s ease-out;
+    box-shadow:
+        0 0 40px rgba(0, 0, 0, 0.5),
+        0 0 80px rgba(131, 58, 180, 0.15);
+}
+
+.info-card p {
+    font-size: 17px;
+    line-height: 1.55;
+    color: var(--text);
+    opacity: 0.92;
+    margin-bottom: 20px;
+}
+
+body.light-mode .info-card p {
+    color: #222;
+    opacity: 0.9;
+}
+
+/* =====================================================
+   ANALYSIS SUMMARY
+===================================================== */
+
+.analysis-summary {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 25px;
+}
+
+.analysis-summary .check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 12px;
+    margin-left: 6px;
+    font-size: 15px;
+    border-radius: 12px;
+    font-weight: 600;
+
+    background: rgba(46, 204, 113, 0.22);
+    border: 1px solid rgba(46, 204, 113, 0.4);
+    color: #27ae60;
+
+    backdrop-filter: blur(4px);
+    transition: var(--transition);
+}
+
+/* =====================================================
+   FLASH MESSAGES
+===================================================== */
+
+.flash-box {
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    text-align: center;
+
+    border-radius: 12px;
+
+    background: rgba(231, 60, 60, 0.15);
+    border: 1px solid rgba(231, 76, 60, 0.45);
+    color: #ffb3b3;
+}
+
+body.light-mode .flash-box {
+    background: rgba(231, 76, 60, 0.10);
+    border-color: rgba(231, 76, 60, 0.5);
+    color: #c0392b;
+}
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+
+@keyframes fadeUp {
+    0% {
+        opacity: 0;
+        transform: translateY(22px) scale(0.98);
+        filter: blur(3px);
+    }
+    70% {
+        opacity: 0.85;
+        transform: translateY(6px);
+        filter: blur(0);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes ig-spark-pulse {
+    0% {
+        transform: translateY(-50%) rotate(45deg) scale(0.9);
+        opacity: 0.85;
+        box-shadow:
+            0 0 3px rgba(228, 64, 128, 0.35),
+            0 0 6px rgba(252, 176, 69, 0.35);
+    }
+    100% {
+        transform: translateY(-50%) rotate(45deg) scale(1.1);
+        opacity: 1;
+        box-shadow:
+            0 0 6px rgba(228, 64, 128, 0.7),
+            0 0 12px rgba(252, 176, 69, 0.6);
+    }
+}
+

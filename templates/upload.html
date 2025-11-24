@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Instagram Follower Checker</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- MODAL POPUP: INFO INSTAGRAM -->
+    <div id="info-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-card fade-up">
+            <h2>Come ottenere i file da Instagram</h2>
+
+            <ul>
+                <li>Apri Instagram</li>
+                <li>Vai su <strong>Impostazioni → Centro Gestione Account di Meta</strong></li>
+                <li>Vai su <strong>Le tue informazioni e autorizzazioni</strong></li>
+                <li>Richiedi l'esportazione dei tuoi dati</li>
+                <li>Imposta il tipo file su <strong>JSON</strong></li>
+                <li>Intervallo di tempo: <strong>Sempre</strong></li>
+                <li>Dopo l’email scarica lo ZIP → apri la cartella <strong>connections</strong></li>
+                <li>Carica qui: <strong>followers_1.json</strong> e <strong>following.json</strong></li>
+            </ul>
+
+            <button id="close-modal" class="btn gradient-btn">Ho capito</button>
+        </div>
+    </div>
+
+    <!-- TOGGLE THEME -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Cambia tema">🌙</button>
+
+    <!-- TOGGLE INFO -->
+    <button id="info-toggle" class="info-toggle" aria-label="Informazioni">❔</button>
+
+    <!-- LOADER OVERLAY -->
+    <div id="loader-overlay" class="loader-overlay" style="display:none;">
+        <div class="loader-card fade-up">
+            <div class="spinner"></div>
+            <p>Analisi in corso…</p>
+        </div>
+    </div>
+
+    <!-- CARD PRINCIPALE -->
+    <div class="card fade-up">
+
+        <h1>Instagram Follower Checker</h1>
+
+        <!-- FLASH MESSAGES -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-box">
+                    {{ messages[0] }}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- FORM PRINCIPALE -->
+        <form id="analyze-form" action="/analizza" method="POST" enctype="multipart/form-data">
+            {{ csrf_token() }}
+
+            <!-- FILE FOLLOWERS -->
+            <div class="file-box followers" data-input="followers-input">
+
+                <label for="followers-input">Carica <strong>followers_1.json</strong></label>
+
+                <div class="drop-area" id="drop-followers">
+                    <span class="drop-text">Clicca o trascina qui il file</span>
+                </div>
+
+                <input type="file" id="followers-input" name="followers" accept=".json" required hidden>
+            </div>
+
+            <!-- FILE FOLLOWING -->
+            <div class="file-box following" data-input="following-input">
+
+                <label for="following-input">Carica <strong>following.json</strong></label>
+
+                <div class="drop-area" id="drop-following">
+                    <span class="drop-text">Clicca o trascina qui il file</span>
+                </div>
+
+                <input type="file" id="following-input" name="following" accept=".json" required hidden>
+            </div>
+
+            <button type="submit" id="submit-btn" class="btn gradient-btn">Analizza</button>
+
+        </form>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer fade-up">
+        © 2025 Antonio Marco Vanacore – Tutti i diritti riservati ·
+        <a href="/info">Info &amp; Privacy</a>
+    </footer>
+
+
+    <!-- SCRIPT: Drop Area UI Sync -->
+    <script>
+        document.querySelectorAll(".drop-area").forEach(area => {
+            const inputId = area.parentElement.dataset.input;
+            const input = document.getElementById(inputId);
+            const text = area.querySelector(".drop-text");
+
+            area.addEventListener("click", () => input.click());
+
+            input.addEventListener("change", () => {
+                if (input.files.length) {
+                    text.textContent = input.files[0].name;
+                    area.classList.add("dragover");
+                }
+            });
+
+            area.addEventListener("dragover", e => {
+                e.preventDefault();
+                area.classList.add("dragover");
+            });
+
+            area.addEventListener("dragleave", () => {
+                area.classList.remove("dragover");
+                text.textContent = "Clicca o trascina qui il file";
+            });
+
+            area.addEventListener("drop", e => {
+                e.preventDefault();
+                if (e.dataTransfer.files.length) {
+                    input.files = e.dataTransfer.files;
+                    text.textContent = e.dataTransfer.files[0].name;
+                    area.classList.add("dragover");
+                }
+            });
+        });
+    </script>
+
+    <!-- SCRIPT: Loader -->
+    <script>
+        const form = document.getElementById('analyze-form');
+        const loader = document.getElementById('loader-overlay');
+        const submitBtn = document.getElementById('submit-btn');
+
+        form.addEventListener('submit', () => {
+            loader.style.display = 'flex';
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.6';
+        });
+    </script>
+
+    <!-- SCRIPT: Tema -->
+    <script>
+        const toggleBtn = document.getElementById("theme-toggle");
+
+        function syncIcon() {
+            toggleBtn.textContent =
+                document.body.classList.contains("light-mode") ? "🔆" : "🌙";
+        }
+
+        toggleBtn.addEventListener("click", () => {
+            document.body.classList.toggle("light-mode");
+            syncIcon();
+        });
+
+        syncIcon();
+    </script>
+
+    <!-- SCRIPT: Modale Info -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const infoBtn = document.getElementById("info-toggle");
+            const infoModal = document.getElementById("info-modal");
+            const closeInfo = document.getElementById("close-modal");
+
+            infoBtn.addEventListener("click", () => {
+                infoModal.style.display = "flex";
+            });
+
+            closeInfo.addEventListener("click", () => {
+                infoModal.style.display = "none";
+            });
+
+            if (!sessionStorage.getItem("popupShown")) {
+                infoModal.style.display = "flex";
+                sessionStorage.setItem("popupShown", "true");
+            }
+        });
+    </script>
+
+</body>
+</html>

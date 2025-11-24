@@ -1,0 +1,16 @@
+# Ambiente
+.env
+
+# Virtual environment
+venv/
+env/
+
+# File Python cache
+__pycache__/
+*.pyc
+
+# File di sistema
+.DS_Store
+
+# File sessioni flask
+.flask_session/

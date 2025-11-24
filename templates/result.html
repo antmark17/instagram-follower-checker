@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Risultati – Instagram Follower Checker</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <!-- TOGGLE TEMA -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Cambia tema">🌙</button>
+
+    <!-- CARD RISULTATI -->
+    <div class="card result-card fade-up">
+
+        <h1 class="title-gradient">Utenti che non ti seguono</h1>
+
+        <!-- MESSAGGIO INTRO -->
+        <p class="analysis-summary">
+            Analisi completata con successo <span class="check">✔</span><br>
+            {{ utenti|length }} utenti non ricambiano il follow
+        </p>
+
+        {% if utenti and utenti|length > 0 %}
+
+            <!-- LISTA RISULTATI -->
+            <ul class="result-list fade-up">
+                {% for u in utenti %}
+                    <li class="result-item">@{{ u }}</li>
+                {% endfor %}
+            </ul>
+
+            <!-- BOTTONI -->
+            <div class="buttons-row">
+                <a class="btn gradient-btn" href="/download">Scarica Result.txt</a>
+                <a class="btn back-btn" href="/">Torna alla Home</a>
+            </div>
+
+        {% else %}
+
+            <p class="subtitle fade-up">✨ Ottimo! Tutti gli utenti che segui ti seguono ancora.</p>
+
+            <div class="buttons-row center fade-up">
+                <a class="btn back-btn" href="/">Torna alla Home</a>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer fade-up">
+        © 2025 Antonio Marco Vanacore – Tutti i diritti riservati ·
+        <a href="/info">Info &amp; Privacy</a>
+    </footer>
+
+
+    <!-- SCRIPT TEMA -->
+    <script>
+        const toggleBtn = document.getElementById("theme-toggle");
+
+        function syncIcon() {
+            toggleBtn.textContent =
+                document.body.classList.contains("light-mode") ? "🔆" : "🌙";
+        }
+
+        
+        if (localStorage.getItem("theme") === "light") {
+            document.body.classList.add("light-mode");
+        }
+        syncIcon();
+
+        toggleBtn.addEventListener("click", () => {
+            document.body.classList.toggle("light-mode");
+
+            const isLight = document.body.classList.contains("light-mode");
+            localStorage.setItem("theme", isLight ? "light" : "dark");
+
+            syncIcon();
+        });
+    </script>
+
+</body>
+</html>

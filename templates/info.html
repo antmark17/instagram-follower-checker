@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Info & Privacy</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <!-- TOGGLE TEMA -->
+    <button id="theme-toggle" class="theme-toggle" aria-label="Cambia tema">🌙</button>
+
+    <!-- CARD INFO -->
+    <div class="info-card fade-up">
+
+        <h1 class="title-gradient">Info &amp; Privacy</h1>
+
+        <p>
+            Questo strumento analizza esclusivamente i file
+            <strong>followers_1.json</strong> e <strong>following.json</strong>,
+            ottenuti tramite l’esportazione ufficiale dei tuoi dati Instagram,
+            per identificare gli utenti che non ricambiano il follow.
+        </p>
+
+        <p>
+            I file vengono elaborati <strong>localmente</strong> sul tuo dispositivo:
+            nessuna informazione viene inviata, salvata o condivisa con server esterni.
+            L’analisi avviene direttamente nel browser e nella tua sessione locale.
+        </p>
+
+        <p>
+            Puoi eliminare in qualsiasi momento i file
+            <em>followers_1.json</em>, <em>following.json</em> e
+            <em>Result.txt</em> creati dall’app. Nessun dato rimane
+            memorizzato una volta chiusa la sessione.
+        </p>
+
+        <a href="/" class="btn back-btn">Torna alla Home</a>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="site-footer fade-up">
+        © 2025 Antonio Marco Vanacore – Tutti i diritti riservati
+    </footer>
+
+
+    <!-- SCRIPT: Tema -->
+    <script>
+        const toggleBtn = document.getElementById("theme-toggle");
+
+        function syncIcon() {
+            toggleBtn.textContent =
+                document.body.classList.contains("light-mode") ? "🔆" : "🌙";
+        }
+
+        if (localStorage.getItem("theme") === "light") {
+            document.body.classList.add("light-mode");
+        }
+        syncIcon();
+
+        toggleBtn.addEventListener("click", () => {
+            document.body.classList.toggle("light-mode");
+
+            const isLight = document.body.classList.contains("light-mode");
+            localStorage.setItem("theme", isLight ? "light" : "dark");
+
+            syncIcon();
+        });
+    </script>
+
+</body>
+</html>

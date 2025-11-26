@@ -1,129 +1,108 @@
 # 📸 Instagram Follower Checker
-**Analizza chi non ti segue più usando SOLO i file ufficiali esportati da Instagram.**  
-Totalmente privacy-friendly, nessun dato viene inviato o salvato su server.
+
+**Analizza chi non ti segue più usando i file ufficiali esportati da
+Instagram.**\
+Sicuro, affidabile e compatibile con i nuovi formati JSON Meta
+(2024--2025+).
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue)
-![Flask](https://img.shields.io/badge/Flask-Framework-green)
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Flask](https://img.shields.io/badge/Flask-Framework-green) ![License:
+MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-
----
+------------------------------------------------------------------------
 
 ## ✨ Caratteristiche
 
-- Analisi totalmente locale: nessun dato inviato online
-- Algoritmo intelligente che confronta followers vs following
-- Interfaccia moderna (dark/light mode) stile Instagram
-- Sicuro:
-  - Validazione JSON avanzata
-  - CSRF Protection
-  - Rate limiting
-  - Anti-corruzione file
-  - Secret key sicura
-- Download del risultato in `Result.txt`
+-   Analisi dei profili tramite file esportati ufficialmente da
+    Instagram
+-   Supporto ai **nuovi formati JSON Meta** (2024--2025+)
+-   Algoritmo intelligente per il confronto *followers vs following*
+-   Interfaccia moderna con dark/light mode
+-   Sicuro:
+    -   Validazione avanzata dei file JSON
+    -   Protezione CSRF
+    -   Rate limiting
+    -   Anti-corruzione file e controllo MIME
+    -   Secret key sicura (via `.env`)
+    -   Nessun dato salvato su disco (elaborazione solo in RAM)
+    -   Header anti-cache globali per maggiore privacy
+-   Drag & Drop migliorato:
+    -   Anti-reset del file già caricato
+    -   Blocco caricamento multiplo
+-   Download del risultato tramite **POST** (più sicuro di GET)
+-   Risultato esportato in `Result.txt`
 
----
+------------------------------------------------------------------------
 
 ## 📦 Requisiti
 
-- Python 3.9 o superiore
-- pip
+-   Python 3.9 o superiore\
+-   pip
 
----
+------------------------------------------------------------------------
 
 ## 🔧 Installazione locale
 
-Clona la repo:
+Clona la repository:
 
-```bash
+``` bash
 git clone https://github.com/tuo_username/instagram-follower-checker.git
 cd instagram-follower-checker
 ```
 
 Installa le dipendenze:
 
-```bash
+``` bash
 pip install -r requirements.txt
 ```
 
 Crea un file `.env` con:
 
-```
-SECRET_KEY= "latuasecretkey"
-```
+    SECRET_KEY="tua-secret-key-sicura"
 
-Avvia l’app:
+Avvia l'app:
 
-```bash
+``` bash
 python app.py
 ```
 
-L’app sarà disponibile su:
+L'app sarà disponibile su:
 
-```
-http://127.0.0.1:5000
-```
+    http://127.0.0.1:5000
 
----
+------------------------------------------------------------------------
 
 ## 📂 Struttura del progetto
 
-```
-📁 PY
- ├── app.py
- ├── algorithm.py
- ├── static/style.css
- ├── templates/
- │   ├── upload.html
- │   ├── result.html
- │   └── info.html
- ├── .env
- ├── .gitignore
- ├── LICENSE
- ├── Procfile
- └── README.md
-```
+    📁 PY
+     ├── app.py
+     ├── algorithm.py
+     ├── static/style.css
+     ├── templates/
+     │   ├── upload.html
+     │   ├── result.html
+     │   └── info.html
+     ├── .env
+     ├── .gitignore
+     ├── LICENSE
+     ├── Procfile
+     └── README.md
 
----
+------------------------------------------------------------------------
 
 ## 🔐 Sicurezza
 
-### ✔ CSRF Protection  
-Ogni form contiene un token verificato lato server.
+### ✔ CSRF Protection
 
-### ✔ Rate Limiting  
-- `/analizza` → max 10 richieste/minuto  
-- `/download` → max 30 richieste/minuto
+Ogni form contiene un token sicuro per prevenire attacchi cross-site.
 
-### ✔ Validazione avanzata dei file  
-- JSON valido  
-- MIME controllato  
-- No file binari rinominati  
-- No null bytes  
-- Controllo struttura Instagram autentica
+### ✔ Rate Limiting
 
-### ✔ Nessun dato salvato  
-Tutto è processato in RAM.
+-   `/analizza` → max 10 richieste/minuto\
+-   `/download` → max 30 richieste/minuto
 
----
+### ✔ Validazione avanzata dei file
 
-
-## 🔮 Roadmap futura
-
-- Supporto per più file followers
-- Modalità confronto cronologico
-- Supporto export Instagram HTML
-- Modalità desktop app
-
----
-
-## 📝 License  
-MIT License – vedi il file LICENSE
-
-
----
-
-## 👤 Autore
-
-**Antonio Marco Vanacore**  
-2025 – Tutti i diritti riservati
+-   Controllo MIME del file\
+-   JSON valido\
+-   Rilevamento null bytes (`

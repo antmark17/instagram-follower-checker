@@ -102,36 +102,48 @@
             const inputId = area.parentElement.dataset.input;
             const input = document.getElementById(inputId);
             const text = area.querySelector(".drop-text");
-
+        
+            ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
+                area.addEventListener(eventName, e => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+            });
+        
             area.addEventListener("click", () => input.click());
-
+        
             input.addEventListener("change", () => {
                 if (input.files.length) {
                     text.textContent = input.files[0].name;
                     area.classList.add("dragover");
                 }
             });
+        
+            area.addEventListener("dragover", () => {
+                area.classList.add("dragover");
+            });
+        
+            area.addEventListener("dragleave", () => {
+                area.classList.remove("dragover");
+                if (!input.files.length) {
+                    text.textContent = "Clicca o trascina qui il file";
+                }
+            });
+        
+            area.addEventListener("drop", e => {
+                if (e.dataTransfer.files.length !== 1) {
+                return;
+                }
 
-            area.addEventListener("dragover", e => {
-                e.preventDefault();
+                const file = e.dataTransfer.files[0];   //first file to upload
+                input.files = e.dataTransfer.files;
+                text.textContent = file.name;
                 area.classList.add("dragover");
             });
 
-            area.addEventListener("dragleave", () => {
-                area.classList.remove("dragover");
-                text.textContent = "Clicca o trascina qui il file";
-            });
-
-            area.addEventListener("drop", e => {
-                e.preventDefault();
-                if (e.dataTransfer.files.length) {
-                    input.files = e.dataTransfer.files;
-                    text.textContent = e.dataTransfer.files[0].name;
-                    area.classList.add("dragover");
-                }
-            });
         });
-    </script>
+        </script>
+        
 
     <!-- SCRIPT: Loader -->
     <script>

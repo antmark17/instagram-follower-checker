@@ -33,9 +33,16 @@
 
             <!-- BOTTONI -->
             <div class="buttons-row">
-                <a class="btn gradient-btn" href="/download">Scarica Result.txt</a>
+                <form action="/download" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="raw_result" value="{{ raw_result }}">
+                    <button type="submit" class="btn gradient-btn">Scarica Result.txt</button>
+                </form>
+            
                 <a class="btn back-btn" href="/">Torna alla Home</a>
             </div>
+            
+            
 
         {% else %}
 

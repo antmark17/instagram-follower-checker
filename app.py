@@ -1,12 +1,13 @@
-from flask import Flask, render_template, request, send_file, session, flash, redirect
+from flask import Flask, render_template, request, send_file, flash, redirect
 import json
 import io
 import algorithm
 import os
 from dotenv import load_dotenv
 import secrets
+import logging
+from werkzeug.exceptions import RequestEntityTooLarge
 from werkzeug.utils import secure_filename
-
 
 from flask_wtf import CSRFProtect
 from flask_limiter import Limiter
@@ -20,8 +21,7 @@ app = Flask(__name__)
 # CONFIG DI BASE
 # -------------------------------
 
-
-app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024  # Limite 5MB
 
 # SECRET KEY
 secret = os.getenv("SECRET_KEY")
@@ -30,123 +30,105 @@ if not secret:
     print("⚠ Nessuna SECRET_KEY trovata nel .env → generata automaticamente!")
 app.secret_key = secret
 
-
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 
+logging.basicConfig(level=logging.INFO)
 
-# -------------------------------
-# CSRF PROTECTION
-# -------------------------------
+# CSRF
 csrf = CSRFProtect(app)
 
-# -------------------------------
-# RATE LIMITING
-# -------------------------------
+# Rate limiting
 limiter = Limiter(
     key_func=get_remote_address,
     app=app,
-    default_limits=[] 
+    default_limits=[]
 )
 
 # -------------------------------
-# VALIDAZIONI FILE
+# HANDLER ERRORI
 # -------------------------------
 
+@app.errorhandler(RequestEntityTooLarge)
+def file_troppo_grande(e):
+    flash("Il file che hai caricato supera il limite massimo consentito (5MB).")
+    return redirect("/")
+
+
+# -------------------------------
+# NO CACHE HEADERS
+# -------------------------------
+
+@app.after_request
+def no_cache_headers(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
+# -------------------------------
+# VALIDAZIONE FILE JSON
+# -------------------------------
+
+def extract_href(data):
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if key == "href" and isinstance(value, str) and value.strip():
+                return value
+            found = extract_href(value)
+            if found:
+                return found
+    elif isinstance(data, list):
+        for item in data:
+            found = extract_href(item)
+            if found:
+                return found
+    return None
+
+
 def validate_followers_structure(file_stream):
-    """Valida il file dei follower (followers_1.json)."""
     try:
         data = json.load(file_stream)
-    except json.JSONDecodeError:
-        return False, (
-            "followers_1.json non è un file JSON valido. "
-            "Assicurati di caricare il file originale ottenuto dall’esportazione di Instagram."
-        )
-    except Exception:
-        return False, (
-            "Si è verificato un errore durante la lettura di followers_1.json."
-        )
+    except Exception as e:
+        logging.error(f"Errore parsing followers.json: {e}")
+        return False, "followers_1.json non è un file JSON valido o risulta corrotto."
 
     if not isinstance(data, list) or not data:
-        return False, (
-            "followers_1.json sembra vuoto o con una struttura non valida. "
-            "Potrebbe non provenire dall’esportazione ufficiale di Instagram."
-        )
+        return False, "followers_1.json risulta vuoto o non formattato correttamente."
 
-    for item in data:
-        if not isinstance(item, dict):
-            continue
+    href = extract_href(data)
 
-        sld = item.get("string_list_data")
-        if not isinstance(sld, list) or not sld:
-            continue
+    if href:
+        return True, ""
 
-        first = sld[0]
-        if not isinstance(first, dict):
-            continue
-
-        href = first.get("href")
-        if isinstance(href, str) and href.strip():
-            return True, ""
-
-    return (
-        False,
-        "followers_1.json non contiene le informazioni necessarie per identificare i profili. "
-        "Verifica di aver caricato il file originale presente nella cartella 'connections' "
-        "dell’esportazione ufficiale di Instagram."
+    logging.warning("Formato followers_1.json non riconosciuto: possibile modifica da parte di Instagram.")
+    return False, (
+        "Il formato di followers_1.json non è riconosciuto. "
+        "Instagram potrebbe aver aggiornato la struttura del file."
     )
 
 
 def validate_following_structure(file_stream):
-    """Valida il file dei profili che segui (following.json)."""
     try:
         data = json.load(file_stream)
-    except json.JSONDecodeError:
-        return False, (
-            "following.json non è un file JSON valido. "
-            "Assicurati di caricare il file originale ottenuto dall’esportazione di Instagram."
-        )
-    except Exception:
-        return False, (
-            "Si è verificato un errore durante la lettura di following.json."
-        )
+    except Exception as e:
+        logging.error(f"Errore parsing following.json: {e}")
+        return False, "following.json non è un file JSON valido o risulta corrotto."
 
     if not isinstance(data, dict):
-        return False, (
-            "following.json ha una struttura non valida. "
-            "Il file dovrebbe contenere un oggetto JSON (dict) con la sezione "
-            "'relationships_following'."
-        )
+        return False, "following.json ha una struttura non valida."
 
-    rf = data.get("relationships_following")
-    if not isinstance(rf, list) or not rf:
-        return False, (
-            "La sezione 'relationships_following' risulta vuota o non formattata correttamente. "
-            "Verifica di aver caricato il file originale presente nella cartella 'connections' "
-            "dell’esportazione ufficiale di Instagram."
-        )
+    href = extract_href(data)
 
-    for item in rf:
-        if not isinstance(item, dict):
-            continue
+    if href:
+        return True, ""
 
-        sld = item.get("string_list_data")
-        if not isinstance(sld, list) or not sld:
-            continue
-
-        first = sld[0]
-        if not isinstance(first, dict):
-            continue
-
-        href = first.get("href")
-        if isinstance(href, str) and href.strip():
-            return True, ""
-
-    return (
-        False,
-        "following.json non contiene dati validi per identificare gli utenti seguiti. "
-        "Assicurati di caricare il file originale presente nella cartella 'connections' "
-        "dell’esportazione ufficiale di Instagram."
+    logging.warning("Formato following.json non riconosciuto: possibile modifica da parte di Instagram.")
+    return False, (
+        "Il formato di following.json non è riconosciuto. "
+        "Instagram potrebbe aver aggiornato la struttura del file."
     )
+
 
 # -------------------------------
 # ROUTES
@@ -158,7 +140,7 @@ def home():
 
 
 @app.route("/analizza", methods=["POST"])
-@limiter.limit("10 per minuto")  
+@limiter.limit("10 per minuto")
 def analizza():
 
     if "followers" not in request.files or "following" not in request.files:
@@ -168,50 +150,30 @@ def analizza():
     followers_file = request.files["followers"]
     following_file = request.files["following"]
 
-    if followers_file.filename == "":
-        flash("Devi caricare il file JSON dei follower (es. followers_1.json).")
+    if followers_file.filename == "" or following_file.filename == "":
+        flash("Assicurati di caricare entrambi i file JSON richiesti.")
         return redirect("/")
 
-    if following_file.filename == "":
-        flash("Devi caricare il file JSON dei profili che segui (es. following.json).")
+    followers_name = secure_filename(followers_file.filename)
+    following_name = secure_filename(following_file.filename)
+
+    if not followers_name.lower().endswith(".json"):
+        flash("Il file followers deve essere in formato .json.")
         return redirect("/")
 
-    followers_filename = secure_filename(followers_file.filename)
-    following_filename = secure_filename(following_file.filename)
-
-    if not followers_filename.lower().endswith(".json"):
-        flash("Il file dei follower deve essere in formato .json.")
-        return redirect("/")
-
-    if not following_filename.lower().endswith(".json"):
-        flash("Il file dei profili seguiti deve essere in formato .json.")
-        return redirect("/")
-
-    if followers_file.mimetype not in ["application/json", "text/plain"]:
-        flash("Il file dei follower non è riconosciuto come JSON valido.")
-        return redirect("/")
-
-    if following_file.mimetype not in ["application/json", "text/plain"]:
-        flash("Il file dei profili seguiti non è riconosciuto come JSON valido.")
+    if not following_name.lower().endswith(".json"):
+        flash("Il file following deve essere in formato .json.")
         return redirect("/")
 
     followers_bytes = followers_file.read()
     following_bytes = following_file.read()
 
-    if not followers_bytes:
-        flash("Il file dei follower risulta vuoto.")
+    if not followers_bytes or not following_bytes:
+        flash("Uno dei file risulta vuoto.")
         return redirect("/")
 
-    if not following_bytes:
-        flash("Il file dei profili che segui risulta vuoto.")
-        return redirect("/")
-
-    if b"\x00" in followers_bytes[:200]:
-        flash("Il file dei follower sembra corrotto o non un vero JSON.")
-        return redirect("/")
-
-    if b"\x00" in following_bytes[:200]:
-        flash("Il file dei profili seguiti sembra corrotto o non un vero JSON.")
+    if b"\x00" in followers_bytes[:200] or b"\x00" in following_bytes[:200]:
+        flash("Uno dei file sembra corrotto o non è un vero JSON.")
         return redirect("/")
 
     ok, msg = validate_followers_structure(io.BytesIO(followers_bytes))
@@ -229,36 +191,27 @@ def analizza():
         io.BytesIO(following_bytes)
     )
 
-    
     result_text = "\n".join(utenti)
-    session["result_text"] = result_text
 
-    return render_template("result.html", utenti=utenti)
+    return render_template("result.html", utenti=utenti, raw_result=result_text)
 
 
-@app.route("/download")
-@limiter.limit("30 per minuto")  
+@app.route("/download", methods=["POST"])
+@limiter.limit("30 per minuto")
 def download():
-    """Crea il file Result.txt in RAM e lo invia senza salvarlo sul disco."""
-    result_text = session.get("result_text", "")
+    result_text = request.form.get("raw_result", "")
 
     buffer = io.BytesIO(result_text.encode("utf-8"))
     buffer.seek(0)
 
     filename = f"Result_{secrets.token_hex(4)}.txt"
 
-    response = send_file(
+    return send_file(
         buffer,
         mimetype="text/plain",
         as_attachment=True,
         download_name=filename
     )
-
-    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-
-    return response
 
 
 @app.route("/info")

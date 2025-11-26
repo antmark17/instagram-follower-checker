@@ -168,6 +168,34 @@ button:active,
     transform: scale(0.96);
 }
 
+a.btn,
+button.btn {
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    line-height: normal;
+}
+
+
+.buttons-row {
+    display: flex;
+    justify-content: center;
+    gap: 16px;        
+    margin-top: 20px;
+}
+
+
+.buttons-row .btn,
+.buttons-row button.btn {
+    width: auto;      
+    padding: 14px 26px;
+    font-size: 15px;
+    border-radius: 14px;
+    white-space: nowrap;
+}
+
+
+
 /* =====================================================
    TOGGLE BUTTONS
 ===================================================== */
